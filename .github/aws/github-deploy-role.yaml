@@ -21,7 +21,10 @@ Parameters:
     Default: ""
     Description: >-
       With Trust main, the exact OIDC sub claim to trust, such as
-      repo:my-org@123/my-repo@456:ref:refs/heads/main. Unused for pull_request.
+      repo:my-org@123/my-repo@456:ref:refs/heads/main. With Trust
+      pull_request, a StringLike pattern naming the repository, such as
+      repo:my-org*/my-repo*:pull_request, which matches both the mutable and
+      the immutable subject forms.
   RepositoryId:
     Type: String
     AllowedPattern: "[0-9]+"
@@ -45,11 +48,12 @@ Parameters:
     Description: A permissions boundary the account requires on new roles, if any.
 
 Rules:
-  MainNeedsSubjectClaim:
-    RuleCondition: !Equals [!Ref Trust, main]
+  NeedsSubjectClaim:
     Assertions:
       - Assert: !Not [!Equals [!Ref SubjectClaim, ""]]
-        AssertDescription: Trust main needs the SubjectClaim of the main branch.
+        AssertDescription: >-
+          SubjectClaim is required: the main branch's sub claim for Trust main,
+          or a pattern naming the repository for Trust pull_request.
 
 Conditions:
   CreateProvider: !Equals [!Ref CreateOidcProvider, "true"]
@@ -84,15 +88,18 @@ Resources:
             Condition: !If
               # The pull request subject names no branch, and its form for
               # repositories with immutable subject claims isn't documented, so
-              # the immutable IDs pin the repository and the wildcard accepts
-              # either form. Fork pull requests get no OIDC token.
+              # the immutable IDs pin the repository and SubjectClaim is a
+              # pattern that accepts either form, such as
+              # repo:<owner>*/<name>*:pull_request. IAM rejects a sub condition
+              # that is only a wildcard, such as *:pull_request. Fork pull
+              # requests get no OIDC token.
               - TrustsPullRequests
               - StringEquals:
                   "token.actions.githubusercontent.com:aud": sts.amazonaws.com
                   "token.actions.githubusercontent.com:repository_id": !Ref RepositoryId
                   "token.actions.githubusercontent.com:repository_owner_id": !Ref RepositoryOwnerId
                 StringLike:
-                  "token.actions.githubusercontent.com:sub": "*:pull_request"
+                  "token.actions.githubusercontent.com:sub": !Ref SubjectClaim
               - StringEquals:
                   "token.actions.githubusercontent.com:aud": sts.amazonaws.com
                   "token.actions.githubusercontent.com:repository_id": !Ref RepositoryId
