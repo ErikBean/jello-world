@@ -24,9 +24,11 @@ jobs:
       - name: Download the last production templates
         env:
           GH_TOKEN: ${{ github.token }}
+        # Before the first merge, deploy.yml isn't on the default branch yet and
+        # gh run list fails with a 404. Treat that as nothing deployed.
         run: |
           run_id="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow deploy.yml --branch main \
-            --status success --limit 1 --json databaseId -q '.[0].databaseId')"
+            --status success --limit 1 --json databaseId -q '.[0].databaseId' || true)"
           if [ -n "$run_id" ]; then
             gh run download "$run_id" --repo "$GITHUB_REPOSITORY" -n prod-templates -D prod-before || true
           fi
