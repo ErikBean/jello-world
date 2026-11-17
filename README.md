@@ -46,6 +46,8 @@ The factory's stage skills are pinned in `.agents/skills/`, with links from `.cl
 scripts/sync-factory-skills.sh <factory-skills checkout>
 ```
 
+The `factory-skills` job in CI runs `scripts/check-factory-skills.mjs` on every pull request. It warns, without failing the build, when a pinned skill has changed on factory-skills `main` since the pin. Run it yourself with `node scripts/check-factory-skills.mjs`.
+
 ### Checks
 
 ```bash
