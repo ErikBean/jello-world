@@ -1,0 +1,5 @@
+{
+  "source": "git@github.com:ErikBean/factory-skills.git",
+  "commit": "d8c2cb10df3e29cd5949fc65803c43abadb74ef4",
+  "skills": ["factory-implementer", "factory-observer", "factory-orchestrator", "factory-releaser", "factory-reviewer", "factory-spec-writer", "factory-test-writer"]
+}

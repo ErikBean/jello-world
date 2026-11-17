@@ -1,0 +1,9 @@
+commands:
+  test: npm test
+  typecheck: npx tsc --noEmit
+  deploy_dev: npm run dev:deploy
+  smoke_dev: npm run dev:smoke
+  destroy_dev: npm run dev:destroy
+
+dev:
+  profile: agent-builder

@@ -1,0 +1,35 @@
+schema: spec-driven
+
+context: |
+  Merging to main deploys to production through `.github/workflows/deploy.yml`. The CDK app deploys as three stages, chosen with `-c stage=dev|preview|prod` (see `lib/stage.ts`): `dev` per branch in the agent account, `preview` per pull request in the preview account, and `prod`. For now all three stages share AWS account 431104483706 (the organization's management account, an interim exception while the account quota allows no member accounts); `preview` and `prod` deploy through a second CDK bootstrap with the `ci` qualifier that agents can't assume. Nothing in `prod` may depend on a resource in another stage. Every change must leave `npm test`, `npx cdk synth -c stage=prod` and `node scripts/check-role-boundaries.mjs` passing. Every IAM role must carry the `agent-boundary` permissions boundary. The cdk.json context key sets it app-wide, but roles CDK creates for `AwsCustomResource` miss it (aws/aws-cdk#30179) and need `PermissionsBoundary.of(construct).apply(...)`. CDK keeps S3 buckets and DynamoDB tables when a stack is deleted unless they set a removal policy. In `dev` and `preview`, `RemovalPolicies.of(app).destroy()` deletes them with the stack, and every bucket sets `removalPolicy: stage.ephemeral ? RemovalPolicy.DESTROY : RemovalPolicy.RETAIN` and `autoDeleteObjects: stage.ephemeral`, since deleting a bucket that still has objects fails. For `prod`, decide for each one whether its data must outlive the stack. Stack tags (`project`, `stage`, `branch`) are set on each stack's `tags` prop in `bin/jello-world.ts`, because the `@aws-cdk/core:explicitStackTags` flag stops `Tags.of(app)` reaching stacks; every new stack must get them, since the dev cleanup workflow finds stacks by them. Each stack that serves something outputs its URL with a `CfnOutput` whose id starts with `Url`, so the smoke test and the preview comment find it. The account's organization policies may deny some Regions, services or resource types outright, such as EC2 instances, NAT gateways or load balancers, so check what the account allows before designing around a service.
+
+# Project context (optional)
+# Add only constraints that should guide OpenSpec artifacts and workflows.
+# Include constraints an agent cannot infer by reading the code.
+# Keep general project documentation and discoverable codebase facts out.
+# Example:
+#   context: |
+#     Designs and tasks must cover Windows, macOS, and Linux
+#     Write all artifacts in Spanish
+
+# Per-artifact rules (optional)
+# Add custom rules for specific artifacts.
+# Example:
+#   rules:
+#     proposal:
+#       - Keep proposals under 500 words
+#       - Always state what is out of scope
+#     tasks:
+#       - Break tasks into chunks of max 2 hours
+
+# Per-operation guidance (optional)
+# Add advisory guidance for how apply and archive work should be conducted.
+# This is separate from artifact rules above.
+# Example:
+#   operations:
+#     apply:
+#       guidance:
+#         - Keep test summaries concise
+#     archive:
+#       guidance:
+#         - Summarize the archive outcome before finishing
