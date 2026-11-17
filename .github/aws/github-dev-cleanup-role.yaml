@@ -18,6 +18,15 @@ Parameters:
       The reusable workflow allowed to assume the role, as GitHub's
       job_workflow_ref claim names it, such as
       my-org/my-repo/.github/workflows/destroy-dev.yml@refs/heads/main.
+  PullRequestSubject:
+    Type: String
+    AllowedPattern: "^repo:.+:pull_request$"
+    Description: >-
+      A StringLike pattern for the pull request sub claim that names the
+      repository, such as repo:my-org*/my-repo*:pull_request, which matches
+      both the mutable and the immutable subject forms. IAM rejects a sub
+      condition that is only a wildcard, such as *:pull_request, even beside an
+      exact job_workflow_ref.
   RepositoryId:
     Type: String
     AllowedPattern: "[0-9]+"
@@ -80,7 +89,7 @@ Resources:
                 "token.actions.githubusercontent.com:repository_owner_id": !Ref RepositoryOwnerId
                 "token.actions.githubusercontent.com:job_workflow_ref": !Ref CleanupWorkflowRef
               StringLike:
-                "token.actions.githubusercontent.com:sub": "*:pull_request"
+                "token.actions.githubusercontent.com:sub": !Ref PullRequestSubject
       Policies:
         - PolicyName: delete-dev-stacks
           PolicyDocument:
