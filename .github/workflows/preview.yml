@@ -4,6 +4,12 @@ name: Preview
 # URLs on the pull request, and destroys it when the pull request closes. Only
 # this workflow deploys there. Pull requests from forks get no OIDC token, so
 # both jobs skip them.
+#
+# Turned off while the stages share one account: preview and prod use the same
+# `ci` bootstrap roles there, so preview credentials could change prod stacks.
+# Both jobs skip unless the repo variable PREVIEW_ENABLED is "true". Don't set it
+# until preview deploys through roles that can't reach prod stacks. Skipping
+# this workflow isn't the control: the preview role must not exist until then.
 on:
   pull_request:
     types: [opened, synchronize, reopened, closed]
@@ -17,7 +23,7 @@ concurrency:
 
 jobs:
   deploy:
-    if: github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    if: vars.PREVIEW_ENABLED == 'true' && github.event.action != 'closed' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -53,7 +59,7 @@ jobs:
           gh pr comment "$PR" --edit-last --create-if-none --body-file comment.md
 
   destroy:
-    if: github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository
+    if: vars.PREVIEW_ENABLED == 'true' && github.event.action == 'closed' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     permissions:
       contents: read
