@@ -18,6 +18,5 @@ jobs:
     permissions:
       contents: read
       id-token: write
+    # destroy-dev.yml takes the branch from this pull_request event.
     uses: ErikBean/jello-world/.github/workflows/destroy-dev.yml@main
-    with:
-      branch: ${{ github.event.pull_request.head.ref }}

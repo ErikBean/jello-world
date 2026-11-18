@@ -1,18 +1,15 @@
 name: Destroy dev
 
 # Called by dev-cleanup.yml. Deletes every stack in the agent account tagged
-# with this repo's project, stage=dev and the branch, through the CDK
-# execution role, so buckets the stacks empty on delete are emptied. It runs
-# no code from the repo.
+# with this repo's project, stage=dev and the pull request's branch, through
+# the default bootstrap's CDK execution role, so buckets the stacks empty on
+# delete are emptied. It runs no code from the repo.
+#
+# It takes no inputs. The caller is the pull request's own copy of
+# dev-cleanup.yml, so the branch comes from the pull_request event itself,
+# and a pull request can only delete its own branch's dev stacks.
 on:
   workflow_call:
-    inputs:
-      branch:
-        type: string
-        required: true
-      qualifier:
-        type: string
-        default: hnb659fds
 
 permissions:
   contents: read
@@ -20,6 +17,7 @@ permissions:
 
 jobs:
   destroy:
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: aws-actions/configure-aws-credentials@v6
@@ -28,10 +26,14 @@ jobs:
           aws-region: ${{ vars.AWS_REGION }}
       - name: Delete the branch's dev stacks
         env:
-          BRANCH: ${{ inputs.branch }}
-          QUALIFIER: ${{ inputs.qualifier }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+          QUALIFIER: hnb659fds
           PROJECT: ${{ github.event.repository.name }}
         run: |
+          if [ -z "$BRANCH" ]; then
+            echo "No pull request branch in the event." >&2
+            exit 1
+          fi
           # The same slug as devSlug in lib/stage.ts, which tags dev stacks with it.
           readable="$(printf '%s' "$BRANCH" | LC_ALL=C sed -E 's/[^A-Za-z0-9]+/-/g; s/^-+|-+$//g' | LC_ALL=C cut -c1-50 | sed -E 's/-+$//')"
           hash="$(printf '%s' "$BRANCH" | sha256sum | cut -c1-8)"
