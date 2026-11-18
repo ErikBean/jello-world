@@ -3,6 +3,7 @@
 // pull request in the preview account, and one prod stack set in production.
 // Pass the stage with -c stage=<dev|preview|prod>, plus -c branch=<branch> for
 // dev or -c pr=<number> for preview.
+import { createHash } from "node:crypto";
 import { App } from "aws-cdk-lib";
 
 export type StageName = "dev" | "preview" | "prod";
@@ -24,9 +25,9 @@ export interface Stage {
    */
   ephemeral: boolean;
   /**
-   * For dev, the branch as it appears in stack names. Tag dev stacks with it,
-   * as Tags.of(app).add("branch", stage.branch), so the dev cleanup workflow
-   * finds them when the branch's pull request closes.
+   * For dev, the branch as it appears in stack names and in the stacks'
+   * "branch" tag, by which the dev cleanup workflow finds them when the
+   * branch's pull request closes. See devSlug.
    */
   branch?: string;
   /**
@@ -44,9 +45,8 @@ export function stageFromContext(app: App): Stage {
   if (name === "prod") return { name, suffix: "", ephemeral: false, qualifier: ciQualifier };
   if (name === "dev") {
     const branch = String(app.node.tryGetContext("branch") ?? "");
-    // Stack names allow letters, digits and hyphens, up to 128 characters.
-    const slug = branch.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 60);
-    if (!slug) throw new Error("dev needs the branch: -c stage=dev -c branch=<branch>");
+    if (!branch) throw new Error("dev needs the branch: -c stage=dev -c branch=<branch>");
+    const slug = devSlug(branch);
     return { name, suffix: `-dev-${slug}`, ephemeral: true, branch: slug };
   }
   if (name === "preview") {
@@ -55,4 +55,18 @@ export function stageFromContext(app: App): Stage {
     return { name, suffix: `-preview-pr${pr}`, ephemeral: true, qualifier: ciQualifier };
   }
   throw new Error("Pass the stage: -c stage=dev, preview or prod");
+}
+
+/**
+ * The branch as it appears in dev stack names and tags. Stack names allow
+ * letters, digits and hyphens, up to 128 characters, so the readable part
+ * replaces everything else with hyphens and stops at 50 characters. The hash of
+ * the full branch name keeps branches that read the same apart, such as
+ * feature/a and feature-a. .github/workflows/destroy-dev.yml computes the same
+ * slug in shell; keep the two in step.
+ */
+export function devSlug(branch: string): string {
+  const readable = branch.replace(/[^A-Za-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 50).replace(/-+$/, "");
+  const hash = createHash("sha256").update(branch).digest("hex").slice(0, 8);
+  return readable ? `${readable}-${hash}` : hash;
 }
