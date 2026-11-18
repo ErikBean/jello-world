@@ -31,6 +31,8 @@ jobs:
       pull-requests: write
     steps:
       - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v7
         with:
           node-version-file: .nvmrc
@@ -68,6 +70,7 @@ jobs:
       # The pull request's own code, so stacks it added are destroyed too.
       - uses: actions/checkout@v7
         with:
+          persist-credentials: false
           ref: ${{ github.event.pull_request.head.sha }}
       - uses: actions/setup-node@v7
         with:
