@@ -13,7 +13,7 @@ function synth(context: Record<string, string>) {
 }
 
 test("prod synthesizes with no stack name suffix", () => {
-  const { stage, template } = synth({ stage: "prod" });
+  const { stage, template } = synth({ stage: "prod", ciQualifier: "ci" });
   expect(stage.suffix).toBe("");
   expect(stage.ephemeral).toBe(false);
   expect(template.toJSON()).toBeDefined();
@@ -27,8 +27,16 @@ test("dev stacks are named per branch and are ephemeral", () => {
 });
 
 test("preview stacks are named per pull request", () => {
-  const { stage } = synth({ stage: "preview", pr: "12" });
+  const { stage } = synth({ stage: "preview", pr: "12", ciQualifier: "ci" });
   expect(stage.suffix).toBe("-preview-pr12");
+});
+
+test.each(["prod", "preview"])("%s fails without the ci qualifier", (name) => {
+  for (const ciQualifier of [undefined, ""]) {
+    const context: Record<string, string> = { stage: name, pr: "12" };
+    if (ciQualifier !== undefined) context.ciQualifier = ciQualifier;
+    expect(() => synth(context)).toThrow(/ci bootstrap/);
+  }
 });
 
 test("a missing stage fails", () => {

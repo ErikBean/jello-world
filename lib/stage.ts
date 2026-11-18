@@ -31,18 +31,25 @@ export interface Stage {
    */
   branch?: string;
   /**
-   * The CDK bootstrap qualifier to deploy with, when it isn't the default. Set
-   * for preview and prod when cdk.json has a "ciQualifier" context value,
-   * because they share an account with dev and must deploy through a separate
-   * bootstrap that agents can't use. Pass it to the stack's synthesizer.
+   * The CDK bootstrap qualifier to deploy with, when it isn't the default.
+   * Always set for preview and prod, from cdk.json's "ciQualifier" context
+   * value, because they share an account with dev and must deploy through a
+   * separate bootstrap that agents can't use. Pass it to the stack's
+   * synthesizer.
    */
   qualifier?: string;
 }
 
 export function stageFromContext(app: App): Stage {
   const name = app.node.tryGetContext("stage");
-  const ciQualifier = app.node.tryGetContext("ciQualifier") || undefined;
-  if (name === "prod") return { name, suffix: "", ephemeral: false, qualifier: ciQualifier };
+  // All three stages share one account for now, so prod and preview must not
+  // fall back to the default bootstrap, whose roles agents can assume for dev.
+  const ciQualifier = (): string => {
+    const qualifier = String(app.node.tryGetContext("ciQualifier") ?? "");
+    if (!qualifier) throw new Error(`${name} deploys through the ci bootstrap: set "ciQualifier" in cdk.json's context`);
+    return qualifier;
+  };
+  if (name === "prod") return { name, suffix: "", ephemeral: false, qualifier: ciQualifier() };
   if (name === "dev") {
     const branch = String(app.node.tryGetContext("branch") ?? "");
     if (!branch) throw new Error("dev needs the branch: -c stage=dev -c branch=<branch>");
@@ -52,7 +59,7 @@ export function stageFromContext(app: App): Stage {
   if (name === "preview") {
     const pr = String(app.node.tryGetContext("pr") ?? "");
     if (!/^[0-9]+$/.test(pr)) throw new Error("preview needs the pull request number: -c stage=preview -c pr=<number>");
-    return { name, suffix: `-preview-pr${pr}`, ephemeral: true, qualifier: ciQualifier };
+    return { name, suffix: `-preview-pr${pr}`, ephemeral: true, qualifier: ciQualifier() };
   }
   throw new Error("Pass the stage: -c stage=dev, preview or prod");
 }
