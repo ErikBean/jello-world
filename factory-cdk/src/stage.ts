@@ -1,10 +1,10 @@
-// Which stage this synth or deploy is for, and the suffix that keeps its stack
-// names apart: dev stacks per branch in the agent account, preview stacks per
-// pull request in the preview account, and one prod stack set in production.
-// Pass the stage with -c stage=<dev|preview|prod>, plus -c branch=<branch> for
-// dev or -c pr=<number> for preview.
+// Which stage a synth or deploy is for, read from CDK context, and the suffix
+// that keeps its stack names apart: dev stacks per branch, preview stacks per
+// pull request, and one prod stack set. Pass -c stage=<dev|preview|prod>, plus
+// -c branch=<branch> for dev or -c pr=<number> for preview. Part of the factory
+// construct library spike; would move to the shared package.
 import { createHash } from "node:crypto";
-import { App } from "aws-cdk-lib";
+import type { IConstruct } from "constructs";
 
 export type StageName = "dev" | "preview" | "prod";
 
@@ -40,24 +40,24 @@ export interface Stage {
   qualifier?: string;
 }
 
-export function stageFromContext(app: App): Stage {
-  const name = app.node.tryGetContext("stage");
+export function stageFromContext(scope: IConstruct): Stage {
+  const name = scope.node.tryGetContext("stage");
   // All three stages share one account for now, so prod and preview must not
   // fall back to the default bootstrap, whose roles agents can assume for dev.
   const ciQualifier = (): string => {
-    const qualifier = String(app.node.tryGetContext("ciQualifier") ?? "");
+    const qualifier = String(scope.node.tryGetContext("ciQualifier") ?? "");
     if (!qualifier) throw new Error(`${name} deploys through the ci bootstrap: set "ciQualifier" in cdk.json's context`);
     return qualifier;
   };
   if (name === "prod") return { name, suffix: "", ephemeral: false, qualifier: ciQualifier() };
   if (name === "dev") {
-    const branch = String(app.node.tryGetContext("branch") ?? "");
+    const branch = String(scope.node.tryGetContext("branch") ?? "");
     if (!branch) throw new Error("dev needs the branch: -c stage=dev -c branch=<branch>");
     const slug = devSlug(branch);
     return { name, suffix: `-dev-${slug}`, ephemeral: true, branch: slug };
   }
   if (name === "preview") {
-    const pr = String(app.node.tryGetContext("pr") ?? "");
+    const pr = String(scope.node.tryGetContext("pr") ?? "");
     if (!/^[0-9]+$/.test(pr)) throw new Error("preview needs the pull request number: -c stage=preview -c pr=<number>");
     return { name, suffix: `-preview-pr${pr}`, ephemeral: true, qualifier: ciQualifier() };
   }
