@@ -7,3 +7,14 @@ commands:
 
 dev:
   profile: agent-builder
+
+review:
+  requirements:
+    - name: repo setup templates
+      kind: template
+      url: https://github.com/ErikBean/factory-skills/tree/{pinned}/skills/factory-repo-setup/templates
+    # The account-level specs this repo's stages and roles follow, such as
+    # app-environments, deploy-permissions and agent-permissions.
+    - name: aws-agent-bootstrap specs
+      kind: spec
+      url: https://github.com/ErikBean/aws-agent-bootstrap/tree/main/openspec/specs
