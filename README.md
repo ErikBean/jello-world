@@ -39,7 +39,7 @@ GitHub Actions reaches AWS through GitHub OIDC, with no stored keys. There are t
 
 The deploy role comes from [`.github/aws/github-deploy-role.yaml`](.github/aws/github-deploy-role.yaml), which can also make a preview role once previews have their own isolation,, and the cleanup role from [`.github/aws/github-dev-cleanup-role.yaml`](.github/aws/github-dev-cleanup-role.yaml). Their ARNs are in the repo variables `AWS_DEPLOY_ROLE_ARN` and `AWS_DEV_CLEANUP_ROLE_ARN`.
 
-The admin changes (these role stacks, the repo variables and the ruleset on `main`) are made by the developer in their own terminal, with their own admin sign-in, and never by an agent. Agents push and open pull requests as the `erikbean-agents` GitHub App, which has no admin rights. The GitHub OIDC identity provider is in the `github-deploy-jello-world` stack but serves the whole account, so move it out before deleting that stack.
+The admin changes (these role stacks, the repo variables and the rulesets on `main`) are made by the developer in their own terminal, with their own admin sign-in, and never by an agent. Agents push and open pull requests as the `erikbean-agents` GitHub App, which has no admin rights. Only the developer merges: the `main-review` ruleset needs a code owner's approval of a pull request's latest push, [`CODEOWNERS`](.github/CODEOWNERS) names the developer, and a GitHub App can't be a code owner. [`.claude/hooks/block-merge.mjs`](.claude/hooks/block-merge.mjs) also refuses agents' merge, approve and push-to-`main` commands. The GitHub OIDC identity provider is in the `github-deploy-jello-world` stack but serves the whole account, so move it out before deleting that stack.
 
 ### Factory skills
 
