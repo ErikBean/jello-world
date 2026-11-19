@@ -11,7 +11,6 @@
     "dev:destroy": "cdk destroy --all --force -c stage=dev -c branch=$(git branch --show-current)"
   },
   "devDependencies": {
-    "@aws-cdk/cloudformation-diff": "^2.187.7",
     "@swc/core": "^1.15.0",
     "@swc/jest": "^0.2.39",
     "@types/jest": "^30",
@@ -22,7 +21,8 @@
     "typescript": "~7.0.2"
   },
   "dependencies": {
-    "aws-cdk-lib": "^2.275.0",
+    "@favabean/factory-cdk": "file:vendor/favabean-factory-cdk-0.1.0.tgz",
+    "aws-cdk-lib": "2.277.0",
     "constructs": "^10.5.0"
   }
 }

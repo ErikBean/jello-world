@@ -1,6 +1,6 @@
 import { App } from "aws-cdk-lib";
 import { buildApp } from "../lib/app";
-import { devSlug } from "../factory-cdk/src";
+import { devSlug } from "@favabean/factory-cdk";
 
 // The dev cleanup workflow and the agents' prod and preview denies rely on
 // these names, tags and bootstrap roles.

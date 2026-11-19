@@ -2,33 +2,15 @@ name: CI
 
 on:
   pull_request:
-  workflow_call:
 
 permissions:
   contents: read
 
 jobs:
   test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - uses: actions/setup-node@v7
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - run: npm ci
-      - run: npx tsc --noEmit
-      - run: npm test
-      - run: npx cdk synth --quiet -c stage=prod
-
-  # Warns, without failing, when the skills pinned in .agents/ are behind
-  # factory-skills.
-  factory-skills:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v7
-        with:
-          persist-credentials: false
-      - run: node scripts/check-factory-skills.mjs
+    uses: ErikBean/factory/.github/workflows/app-ci.yml@369dbccb643a4fc004ef1d4dddc84a07977bfd75 # workflows-and-roles, unreleased
+  prod-diff:
+    permissions:
+      contents: read
+      actions: read
+    uses: ErikBean/factory/.github/workflows/app-prod-diff.yml@369dbccb643a4fc004ef1d4dddc84a07977bfd75 # workflows-and-roles, unreleased
