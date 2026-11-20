@@ -1,0 +1,21 @@
+name: Dev cleanup
+
+# Deletes a branch's dev stacks when its pull request closes. pull_request_target
+# runs main's copy of this file, never the pull request's, and the cleanup
+# workflow checks out main, never the pull request's code.
+on:
+  pull_request_target: # zizmor: ignore[dangerous-triggers]
+    types: [closed]
+
+permissions:
+  contents: read
+
+jobs:
+  cleanup:
+    permissions:
+      contents: read
+      id-token: write
+    uses: ErikBean/factory/.github/workflows/app-dev-cleanup.yml@v0.2.0
+    with:
+      aws-account-id: ${{ vars.AWS_ACCOUNT_ID }}
+      aws-region: ${{ vars.AWS_REGION }}
