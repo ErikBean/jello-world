@@ -1,5 +1,5 @@
-# Bumps the factory workflows' SHA pins and the npm packages, a week after
-# each release.
+# Bumps the factory workflows' release tags and the npm packages, a week
+# after each release.
 version: 2
 updates:
   - package-ecosystem: github-actions
@@ -14,3 +14,9 @@ updates:
       interval: weekly
     cooldown:
       default-days: 7
+    # @favabean/factory-cdk pins aws-cdk-lib to one minor version, because its
+    # boundary check reads CDK internals, and npm installs past that pin with
+    # only a warning. A factory release raises the pin; this follows it.
+    ignore:
+      - dependency-name: aws-cdk-lib
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]

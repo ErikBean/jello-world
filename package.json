@@ -1,6 +1,7 @@
 {
   "name": "jello-world",
   "version": "0.1.0",
+  "private": true,
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
@@ -11,6 +12,7 @@
     "dev:destroy": "cdk destroy --all --force -c stage=dev -c branch=$(git branch --show-current)"
   },
   "devDependencies": {
+    "@fission-ai/openspec": "2.0.0",
     "@swc/core": "^1.15.0",
     "@swc/jest": "^0.2.39",
     "@types/jest": "^30",
