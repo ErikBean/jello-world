@@ -19,6 +19,9 @@ test("prod is the jello-world stack, deployed through the ci bootstrap", () => {
   expect(stack.assumeRoleArn).toContain("cdk-ci-deploy-role");
 });
 
+// Previews are off while the stages share an account (see the README). This
+// keeps the stage's naming and ci bootstrap checked for when they return, and
+// the agents' stage=preview deny still relies on the tag.
 test("preview is named for the pull request and deployed through the ci bootstrap", () => {
   const stack = synth({ stage: "preview", pr: "12" });
   expect(stack.stackName).toBe("jello-world-preview-pr12");

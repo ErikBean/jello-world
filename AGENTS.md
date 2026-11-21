@@ -1,8 +1,17 @@
 # AGENTS.md
 
-This is an AWS CDK app written in TypeScript. The app entry point is the file in
-`bin/` that creates the `App`; the stack is defined in `lib/` (the `*-stack.ts`
-file). `cdk.json` tells the CDK Toolkit how to run the app.
+This is an AWS CDK app in TypeScript, built on the factory's construct library,
+[`@favabean/factory-cdk`](https://www.npmjs.com/package/@favabean/factory-cdk).
+The app is [`lib/app.ts`](lib/app.ts): one `StaticSite` in a `FactoryStack`.
+`bin/jello-world.ts` creates the `App`, and `cdk.json` tells the CDK Toolkit how
+to run it.
+
+`FactoryStack` sets the stage from `-c stage=dev|prod`, the stack names, the
+`project`, `stage` and `branch` tags, the bootstrap each stage deploys through,
+and the `agent-boundary` permissions boundary on every IAM role. Synth fails for
+a role without the boundary. Every stack must be a `FactoryStack`, and anything
+that serves a URL outputs it with `stack.addUrl(...)`. `openspec/config.yaml`
+has the rest of the project's rules.
 
 ## Read the construct library docs before writing code
 
@@ -28,11 +37,23 @@ read a whole README into context or re-read a section you have already read.
 
 ## Check your work
 
-- `npm run build` — type-check the project.
-- `npm run test` — run the jest unit tests.
-- `npx cdk synth` — synthesize the CloudFormation template.
-- `npx cdk diff` — compare against the deployed stack.
-- `npx cdk deploy` changes a real AWS account. Ask the user first.
+- `npm test`: the jest tests.
+- `npx tsc --noEmit`: type-check.
+- `npx cdk synth --quiet -c stage=prod`: synthesize production. Every `cdk`
+  command needs `-c stage=...`.
+- `npx factory-check-boundaries cdk.out`: every IAM role has the boundary.
+- `npx openspec ...`: the OpenSpec CLI, installed with the repo. Where a skill
+  says `openspec`, run `npx openspec`.
+
+## Deploying
+
+- Deploy only `dev`, as the `agent-builder` profile: `npm run dev:deploy`,
+  then `npm run dev:smoke` to check the site. The stacks are named and tagged
+  for the current branch, and stay up while its pull request is open, so the
+  developer can try it. CI deletes them when the pull request closes;
+  `npm run dev:destroy` removes them sooner if you need to.
+- Never deploy `prod`. CI deploys it when a pull request merges to `main`, and
+  agents can't assume its bootstrap roles.
 
 ## More resources
 

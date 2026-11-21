@@ -8,7 +8,7 @@
     "test": "jest",
     "cdk": "cdk",
     "dev:deploy": "cdk deploy --all --require-approval never -c stage=dev -c branch=$(git branch --show-current) --outputs-file cdk-outputs.dev.json",
-    "dev:smoke": "node scripts/smoke.mjs cdk-outputs.dev.json",
+    "dev:smoke": "node scripts/smoke.mjs cdk-outputs.dev.json \"jello world!\"",
     "dev:destroy": "cdk destroy --all --force -c stage=dev -c branch=$(git branch --show-current)"
   },
   "devDependencies": {
