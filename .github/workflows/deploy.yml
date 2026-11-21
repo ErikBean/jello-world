@@ -1,0 +1,22 @@
+name: Deploy
+
+# Every push to main deploys to production, after the tests pass.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    uses: ErikBean/factory/.github/workflows/app-ci.yml@v0.2.0
+  deploy:
+    needs: test
+    permissions:
+      contents: read
+      id-token: write
+    uses: ErikBean/factory/.github/workflows/app-deploy.yml@v0.2.0
+    with:
+      aws-account-id: ${{ vars.AWS_ACCOUNT_ID }}
+      aws-region: ${{ vars.AWS_REGION }}

@@ -1,0 +1,23 @@
+commands:
+  test: npm test
+  typecheck: npx tsc --noEmit
+  deploy_dev: npm run dev:deploy
+  smoke_dev: npm run dev:smoke
+  destroy_dev: npm run dev:destroy
+
+dev:
+  profile: agent-builder
+
+review:
+  requirements:
+    # What this repo is set up from: the factory's library, reusable workflows
+    # and roles, at the release the workflows in .github/workflows pin. Keep
+    # the tag here in step with those pins when Dependabot bumps them.
+    - name: factory release
+      kind: template
+      url: https://github.com/ErikBean/factory/tree/v0.2.0
+    # The account-level specs this repo's stages and roles follow, such as
+    # app-environments, deploy-permissions and agent-permissions.
+    - name: aws-agent-bootstrap specs
+      kind: spec
+      url: https://github.com/ErikBean/aws-agent-bootstrap/tree/main/openspec/specs
