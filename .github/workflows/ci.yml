@@ -8,15 +8,15 @@ permissions:
 
 jobs:
   test:
-    uses: ErikBean/factory/.github/workflows/app-ci.yml@v0.3.0
+    uses: ErikBean/factory/.github/workflows/app-ci.yml@v0.3.1
   prod-diff:
     permissions:
       contents: read
       actions: read
-    uses: ErikBean/factory/.github/workflows/app-prod-diff.yml@v0.3.0
+    uses: ErikBean/factory/.github/workflows/app-prod-diff.yml@v0.3.1
 
   # Warns, without failing, when the factory skills pinned in .agents/ are
-  # behind the factory's main branch.
+  # behind the factory's latest release.
   factory-skills:
     runs-on: ubuntu-latest
     steps:

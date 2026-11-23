@@ -25,7 +25,7 @@ All stages run in one AWS account for now, the organization's management account
 
 ### Workflows
 
-The three workflows here call the factory's reusable workflows at a release tag, such as `@v0.3.0`. Dependabot proposes new releases.
+The three workflows here call the factory's reusable workflows at a release tag, such as `@v0.3.1`. Dependabot proposes new releases.
 
 | Workflow | On | Does |
 | --- | --- | --- |
@@ -54,7 +54,7 @@ The factory's stage skills are pinned in `.agents/skills/`, with links from `.cl
 scripts/sync-factory-skills.sh <factory checkout>
 ```
 
-The `factory-skills` job in CI runs `scripts/check-factory-skills.mjs` on every pull request. It warns, without failing the build, when a pinned skill has changed on the factory's `main` since the pin. Run it yourself with `node scripts/check-factory-skills.mjs`.
+The `factory-skills` job in CI runs `scripts/check-factory-skills.mjs` on every pull request. It warns, without failing the build, when a pinned skill has changed in the factory's latest release since the pin. Run it yourself with `node scripts/check-factory-skills.mjs`.
 
 ### Checks
 

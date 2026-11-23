@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Copies the factory's stage skills from a factory-skills checkout into this
+# Copies the factory's stage skills from a factory checkout into this
 # repo, and records the commit they came from in .agents/factory-skills.json.
 #
-# Usage: scripts/sync-factory-skills.sh <path to factory-skills checkout>
+# Usage: scripts/sync-factory-skills.sh <path to factory checkout>
 #
 # The skills land in .agents/skills/, with links from .claude/skills/ so
 # Claude Code finds them too. factory-repo-setup isn't copied: a repo only
@@ -10,7 +10,7 @@
 set -euo pipefail
 
 if [ $# -ne 1 ]; then
-  echo "Usage: $0 <path to factory-skills checkout>" >&2
+  echo "Usage: $0 <path to factory checkout>" >&2
   exit 2
 fi
 

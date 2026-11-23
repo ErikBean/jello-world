@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 // Says whether the factory skills pinned in .agents/factory-skills.json are
-// behind factory-skills' default branch. CI runs it on every pull request and
-// the factory orchestrator runs it before a build.
+// behind the factory's latest release, the v* tag apps take the factory at.
+// CI runs it on every pull request and the factory orchestrator runs it
+// before a build. A source with no release tags is compared with its default
+// branch.
 //
-// Usage: node scripts/check-factory-skills.mjs [factory-skills git URL or path]
+// Usage: node scripts/check-factory-skills.mjs [factory git URL or path]
 //
 // The source defaults to the pin file's "source", fetched over HTTPS. Only
 // changes to the pinned skills, and stage skills added upstream since, count.
@@ -35,7 +37,7 @@ if (!existsSync(pinFile)) {
 }
 
 const pin = JSON.parse(readFileSync(pinFile, "utf8"));
-// CI has no SSH key, and factory-skills is public, so read it over HTTPS.
+// CI has no SSH key, and the factory is public, so read it over HTTPS.
 const source = (process.argv[2] ?? pin.source ?? "").replace(/^git@github\.com:/, "https://github.com/");
 if (!source || !pin.commit) {
   warn("Factory skills pin unreadable", `${pinFile} needs a "source" and a "commit".`);
@@ -43,15 +45,31 @@ if (!source || !pin.commit) {
 }
 
 const short = pin.commit.slice(0, 7);
-const update = "Run scripts/sync-factory-skills.sh <factory-skills checkout> and commit the result to update.";
+const update = "Run scripts/sync-factory-skills.sh <factory checkout> and commit the result to update.";
 const work = mkdtempSync(join(tmpdir(), "factory-skills-"));
 const git = (...args) => execFileSync("git", ["-C", work, ...args], { encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] }).trim();
 
+// The highest vX.Y.Z tag, leaving out prereleases.
+function latestRelease() {
+  const tags = git("ls-remote", "--tags", "--refs", source, "v*")
+    .split("\n")
+    .map((line) => line.split("\t")[1]?.replace("refs/tags/", ""))
+    .filter((tag) => /^v\d+\.\d+\.\d+$/.test(tag ?? ""));
+  const parts = (tag) => tag.slice(1).split(".").map(Number);
+  tags.sort((a, b) => {
+    const [pa, pb] = [parts(a), parts(b)];
+    return pa[0] - pb[0] || pa[1] - pb[1] || pa[2] - pb[2];
+  });
+  return tags.at(-1);
+}
+
 function check() {
   git("init", "-q");
+  let target;
   try {
+    target = latestRelease() ?? "HEAD";
     // Trees and commits are enough to see what changed, so skip file contents.
-    git("fetch", "-q", "--filter=blob:none", source, "HEAD");
+    git("fetch", "-q", "--filter=blob:none", source, target === "HEAD" ? "HEAD" : `refs/tags/${target}`);
   } catch (err) {
     warn("Factory skills not checked", `Couldn't fetch ${source}: ${String(err.stderr ?? err.message).trim()}`);
     return;
@@ -60,9 +78,10 @@ function check() {
   try {
     git("cat-file", "-e", `${pin.commit}^{commit}`);
   } catch {
+    const where = target === "HEAD" ? "the default branch" : target;
     warn(
-      "Factory skills pinned off main",
-      `The pinned commit ${short} isn't on the default branch of ${source}.\n${update}`,
+      "Factory skills pinned off the release",
+      `The pinned commit ${short} isn't in ${where} of ${source}. Sync from a checkout of ${where}.\n${update}`,
     );
     return;
   }
@@ -78,7 +97,7 @@ function check() {
 
   const commits = git("log", "--format=%h %s", `${pin.commit}..FETCH_HEAD`, "--", ...paths);
   if (!commits) {
-    console.log(`Factory skills are up to date with ${source} (pinned ${short}).`);
+    console.log(`Factory skills are up to date with ${source} at ${target} (pinned ${short}).`);
     return;
   }
 
@@ -93,7 +112,7 @@ function check() {
   warn(
     "Factory skills behind",
     [
-      `The skills pinned here at ${short} are ${count} commit${count === 1 ? "" : "s"} behind ${source}.`,
+      `The skills pinned here at ${short} are ${count} commit${count === 1 ? "" : "s"} behind ${source} at ${target}.`,
       `Changed: ${changed.join(", ")}`,
       "",
       commits,
