@@ -10,13 +10,13 @@ permissions:
 
 jobs:
   test:
-    uses: ErikBean/factory/.github/workflows/app-ci.yml@v0.2.0
+    uses: ErikBean/factory/.github/workflows/app-ci.yml@v0.3.0
   deploy:
     needs: test
     permissions:
       contents: read
       id-token: write
-    uses: ErikBean/factory/.github/workflows/app-deploy.yml@v0.2.0
+    uses: ErikBean/factory/.github/workflows/app-deploy.yml@v0.3.0
     with:
       aws-account-id: ${{ vars.AWS_ACCOUNT_ID }}
       aws-region: ${{ vars.AWS_REGION }}

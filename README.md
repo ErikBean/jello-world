@@ -21,11 +21,11 @@ The app is [`lib/app.ts`](lib/app.ts): one `StaticSite` in a `FactoryStack`, bot
 | `dev` | The factory, from the developer's machine, as the `agent-builder` profile (`npm run dev:deploy`) | `jello-world-dev-<branch>-<hash>` | default |
 | `prod` | CI, on every merge to `main` | `jello-world` | `ci` |
 
-All stages run in one AWS account for now, `431104483706` in `us-east-1`, the organization's management account. That's an interim exception until AWS raises the account quota. Prod deploys through the `ci` bootstrap, whose roles agents can't assume, so agents can't deploy to production from their machine. There are no per-pull-request previews while the stages share an account.
+All stages run in one AWS account for now, the organization's management account. That's an interim exception until AWS raises the account quota. Prod deploys through the `ci` bootstrap, whose roles agents can't assume, so agents can't deploy to production from their machine. There are no per-pull-request previews while the stages share an account.
 
 ### Workflows
 
-The three workflows here call the factory's reusable workflows at a release tag, such as `@v0.2.0`. Dependabot proposes new releases.
+The three workflows here call the factory's reusable workflows at a release tag, such as `@v0.3.0`. Dependabot proposes new releases.
 
 | Workflow | On | Does |
 | --- | --- | --- |
@@ -51,10 +51,10 @@ The admin changes (the roles, the repo variables and the rulesets on `main`) are
 The factory's stage skills are pinned in `.agents/skills/`, with links from `.claude/skills/`, and the commit they came from is in `.agents/factory-skills.json`. To update them, run:
 
 ```bash
-scripts/sync-factory-skills.sh <factory-skills checkout>
+scripts/sync-factory-skills.sh <factory checkout>
 ```
 
-The `factory-skills` job in CI runs `scripts/check-factory-skills.mjs` on every pull request. It warns, without failing the build, when a pinned skill has changed on factory-skills `main` since the pin. Run it yourself with `node scripts/check-factory-skills.mjs`.
+The `factory-skills` job in CI runs `scripts/check-factory-skills.mjs` on every pull request. It warns, without failing the build, when a pinned skill has changed on the factory's `main` since the pin. Run it yourself with `node scripts/check-factory-skills.mjs`.
 
 ### Checks
 
