@@ -38,6 +38,7 @@ ship:
   mode: pr              # pr | commit | none
   branch_prefix: factory/
   archive: true         # run `openspec archive` as part of ship
+  review_queue: 3       # most factory pull requests open at once; 0 means no limit
 ```
 
 ## Keys
@@ -83,7 +84,7 @@ Each entry has:
 
 - `name`: how findings refer to it.
 - `kind`: `spec`, `decision` or `template`.
-- `path` or `url`: a file or folder on disk, or a page the reviewer can fetch. In a `url`, `{pinned}` stands for the factory-skills commit in `.agents/factory-skills.json`.
+- `path` or `url`: a file or folder on disk, or a page the reviewer can fetch. In a `url`, `{pinned}` stands for the factory commit the skills were synced from, in `.agents/factory-skills.json`.
 - `private`: `true` if it must not be quoted, linked or named in the repo or a pull request. Findings then state what it requires as a plain requirement. Put private entries in `factory.config.local.yaml`, so their paths aren't published either.
 
 ```yaml
@@ -94,7 +95,7 @@ review:
       url: https://github.com/example/account-setup/tree/main/openspec/specs
     - name: repo setup templates
       kind: template
-      url: https://github.com/example/factory-skills/tree/{pinned}/skills/factory-repo-setup/templates
+      url: https://github.com/example/factory/tree/{pinned}/skills/factory-repo-setup/templates
 ```
 
 ### `review.checks`
@@ -112,6 +113,10 @@ review:
 - `pr`: commit, push the branch and open a pull request.
 - `commit`: commit to the branch and don't push.
 - `none`: leave the changes uncommitted for the human.
+
+### `ship.review_queue`
+
+The most factory pull requests that may be open at once, counted by `ship.branch_prefix`. With that many open, the orchestrator doesn't start a build, and tells the human which pull requests are waiting for their review. The binding constraint on a factory is how many decisions wait on the human, not how many agents can run. `0` turns the limit off. It applies only with `ship.mode` `pr`.
 
 ## Examples
 

@@ -35,7 +35,7 @@ Raw notes from a run live outside the bundle, in `${XDG_STATE_HOME:-~/.local/sta
 The host spawns you after a stage, a gate check or a human checkpoint. Your prompt carries what happened: the stage, the handoff, what the host checked and what it found, any retries or rejections, and what the human said.
 
 1. Check the facts you'll rely on. Read the files, the `git log` and the skill text the event involved. The host's account is a claim, the same as a handoff is.
-2. Append to the run's notes file. Create it with a header that gives the run id, the project repo, the factory-skills commit (`git -C <skills dir> rev-parse HEAD`, or "unknown" if the skills aren't a git checkout) and the date. Add one entry per observation:
+2. Append to the run's notes file. Create it with a header that gives the run id, the project repo, the factory commit the skills came from (`git -C <skills dir> rev-parse HEAD`, or "unknown" if the skills aren't a git checkout) and the date. Add one entry per observation:
 
    ```markdown
    ## <stage or step> · <worked | friction | failure | surprise>

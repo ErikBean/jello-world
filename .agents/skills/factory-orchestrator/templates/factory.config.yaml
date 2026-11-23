@@ -1,6 +1,6 @@
 # Factory config. Every key is optional; these are the defaults.
 # factory.config.local.yaml, kept out of git, is merged over this file.
-# See skills/factory-orchestrator/references/config.md in factory-skills.
+# See skills/factory-orchestrator/references/config.md in ErikBean/factory.
 
 workflow:
   spec: openspec        # openspec | none
@@ -35,3 +35,4 @@ ship:
   mode: pr              # pr | commit | none
   branch_prefix: factory/
   archive: true
+  review_queue: 3       # most factory PRs open at once; 0 means no limit

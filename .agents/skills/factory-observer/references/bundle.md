@@ -68,7 +68,7 @@ Findings also need:
   - `medium`: two or more runs showed it, or one run plus the skill text or a tool's docs explain it.
   - `high`: a primary source, such as a tool's docs or source code, states the cause, and a run showed it.
 - `sources`: entries with `id` and `resource`, cited in the body as `[^id]`. Use links that will still work later:
-  - A factory skill at the commit the run used: `https://github.com/<owner>/factory-skills/blob/<sha>/skills/<skill>/SKILL.md`.
+  - A factory skill at the commit the run used: `https://github.com/<owner>/factory/blob/<sha>/skills/<skill>/SKILL.md`.
   - The project's PR, commit or Actions run, if the project repo is on GitHub.
   - A tool's docs or changelog.
   - The run itself, as `run:<run-id>`, for evidence that only the run had, such as the output of a command. Quote that evidence in the body, since the run's notes file is deleted once it's written.

@@ -37,7 +37,7 @@ Report only what you've checked. A verifier will try to refute each blocking and
 
 - `spec`: requirements, such as OpenSpec specs in another repo.
 - `decision`: recorded decisions behind the requirements.
-- `template`: what the repo was set up from, such as the `factory-repo-setup` templates at the commit in `.agents/factory-skills.json`.
+- `template`: what the repo was set up from, such as the factory release its workflows pin (`https://github.com/ErikBean/factory/tree/v0.2.0`), or, for repos set up before the factory, the `factory-repo-setup` templates at the commit in `.agents/factory-skills.json`.
 
 Read a `path` from disk and a `url` with your fetch tool. In a `url`, replace `{pinned}` with the `commit` in `.agents/factory-skills.json`. For a GitHub repo, `gh api` or a shallow clone into a temporary folder may be easier than fetching pages. If you can't read a source, say so in Evidence and go on without it. Don't guess what it says.
 
