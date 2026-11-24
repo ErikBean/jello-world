@@ -23,7 +23,7 @@
     "typescript": "~7.0.2"
   },
   "dependencies": {
-    "@favabean/factory-cdk": "^0.3.2",
+    "@favabean/factory-cdk": "^0.3.3",
     "aws-cdk-lib": "2.277.0",
     "constructs": "^10.5.0"
   }

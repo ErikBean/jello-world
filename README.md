@@ -27,7 +27,7 @@ All stages run in one AWS account for now, the organization's management account
 
 ### Workflows
 
-The three workflows here call the factory's reusable workflows at a release tag, such as `@v0.3.2`. Dependabot proposes new releases.
+The three workflows here call the factory's reusable workflows at a release tag, such as `@v0.3.3`. Dependabot proposes new releases.
 
 | Workflow | On | Does |
 | --- | --- | --- |
