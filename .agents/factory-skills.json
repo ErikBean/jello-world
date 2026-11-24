@@ -1,5 +1,5 @@
 {
   "source": "https://github.com/ErikBean/factory.git",
-  "commit": "84b58fadcff9ef140a7e1226feba33a1469d7fa0",
+  "commit": "75979e93a151d27efa943200497be3bf41686660",
   "skills": ["factory-implementer", "factory-observer", "factory-orchestrator", "factory-releaser", "factory-reviewer", "factory-spec-writer", "factory-test-writer", "factory-verifier"]
 }
