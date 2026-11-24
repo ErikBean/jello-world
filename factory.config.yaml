@@ -15,9 +15,9 @@ review:
     # the tag here in step with those pins when Dependabot bumps them.
     - name: factory release
       kind: template
-      url: https://github.com/ErikBean/factory/tree/v0.3.1
+      url: https://github.com/ErikBean/factory/tree/v0.3.2
     # The account-level specs this repo's stages and roles follow, such as
     # app-environments, deploy-permissions and agent-permissions.
     - name: factory specs
       kind: spec
-      url: https://github.com/ErikBean/factory/tree/v0.3.1/openspec/specs
+      url: https://github.com/ErikBean/factory/tree/v0.3.2/openspec/specs

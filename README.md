@@ -2,7 +2,7 @@
 
 An agentic hello world.
 
-This repo is for experimenting with shipping code via agents. The goal is a website that says **jello world!**, hosted on Amazon S3 behind Amazon CloudFront.
+This repo is for experimenting with shipping code via agents. The goal is a website that says **jello world!**, hosted on AWS.
 
 The site will be built and deployed with:
 
@@ -14,7 +14,9 @@ The site will be built and deployed with:
 
 Merging to `main` deploys to production. Changes reach `main` only through a pull request whose `test / test` check passed and that the developer approved.
 
-The app is [`lib/app.ts`](lib/app.ts): one `StaticSite` in a `FactoryStack`, both from [`@favabean/factory-cdk`](https://www.npmjs.com/package/@favabean/factory-cdk). The stack carries the platform's rules, so this repo doesn't copy them: the stage, stack names and tags, the `ci` bootstrap for prod, and the `agent-boundary` permissions boundary on every IAM role, checked when it synthesizes.
+The app is [`lib/app.ts`](lib/app.ts): one `FunctionUrlSite` in a `FactoryStack`, both from [`@favabean/factory-cdk`](https://www.npmjs.com/package/@favabean/factory-cdk). The stack carries the platform's rules, so this repo doesn't copy them: the stage, stack names and tags, the `ci` bootstrap for prod, and the `agent-boundary` permissions boundary on every IAM role, checked when it synthesizes.
+
+It serves the site from a Lambda function URL rather than CloudFront, because AWS hasn't yet verified the account for CloudFront. Once it has, the app moves to `StaticSite`, which changes the site's URL.
 
 | Stage | Deployed by | Stack name | CDK bootstrap |
 | --- | --- | --- | --- |
@@ -25,7 +27,7 @@ All stages run in one AWS account for now, the organization's management account
 
 ### Workflows
 
-The three workflows here call the factory's reusable workflows at a release tag, such as `@v0.3.1`. Dependabot proposes new releases.
+The three workflows here call the factory's reusable workflows at a release tag, such as `@v0.3.2`. Dependabot proposes new releases.
 
 | Workflow | On | Does |
 | --- | --- | --- |

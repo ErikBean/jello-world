@@ -2,7 +2,7 @@
 
 This is an AWS CDK app in TypeScript, built on the factory's construct library,
 [`@favabean/factory-cdk`](https://www.npmjs.com/package/@favabean/factory-cdk).
-The app is [`lib/app.ts`](lib/app.ts): one `StaticSite` in a `FactoryStack`.
+The app is [`lib/app.ts`](lib/app.ts): one `FunctionUrlSite` in a `FactoryStack`, until AWS verifies the account for CloudFront and it can move to `StaticSite`.
 `bin/jello-world.ts` creates the `App`, and `cdk.json` tells the CDK Toolkit how
 to run it.
 

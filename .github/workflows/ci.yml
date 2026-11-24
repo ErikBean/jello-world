@@ -8,12 +8,12 @@ permissions:
 
 jobs:
   test:
-    uses: ErikBean/factory/.github/workflows/app-ci.yml@v0.3.1
+    uses: ErikBean/factory/.github/workflows/app-ci.yml@v0.3.2
   prod-diff:
     permissions:
       contents: read
       actions: read
-    uses: ErikBean/factory/.github/workflows/app-prod-diff.yml@v0.3.1
+    uses: ErikBean/factory/.github/workflows/app-prod-diff.yml@v0.3.2
 
   # Warns, without failing, when the factory skills pinned in .agents/ are
   # behind the factory's latest release.
