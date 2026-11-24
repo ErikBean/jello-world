@@ -19,7 +19,7 @@ Your prompt from the orchestrator gives you the change id, the base ref to diff 
 3. **Review in this order:**
    1. **Coverage.** Does every scenario in the change have a test that would fail without the code? List the ones that don't.
    2. **Conformance.** Does the code do what each requirement says, and nothing the change didn't ask for?
-   3. **Alignment.** Does the change contradict any source in `review.requirements`, such as a spec in another repo, a recorded decision, or the template the repo was set up from? Also check what the checks in `review.checks` flagged.
+   3. **Alignment.** Does the change contradict any source in `review.requirements`, such as a spec in another repo, a recorded decision, or the template the repo was set up from? Also check what the checks in `review.checks` flagged. If the config lists `research`, check the code follows each recommendation the change's spec cites from it. A departure is `should-fix`, unless the spec says why it departs. The spec, which the human approved, outranks the research.
    4. **Honest tests.** Look for skipped or focused tests, mocks of the unit under test, and assertions that are weaker than the red stage's version. Run `git log` to see the red commit's version.
    5. **Correctness.** Look for bugs, unhandled errors, edge cases the requirement implies, and security problems such as injection, secrets in code and missing authorization.
    6. **Design.** Does the code follow `design.md`, or explain why it doesn't?

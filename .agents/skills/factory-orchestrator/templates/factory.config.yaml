@@ -25,6 +25,8 @@ commands:
 dev:
   profile: ""
 
+research: []            # knowledge bundles the spec stage proposes requirements from; see references/config.md
+
 review:
   max_rounds: 2
   verify: true

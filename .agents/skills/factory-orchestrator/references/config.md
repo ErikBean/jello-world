@@ -28,6 +28,8 @@ commands:
 dev:
   profile: ""           # AWS CLI profile the dev commands run with
 
+research: []           # knowledge bundles the spec stage proposes requirements from; see below
+
 review:
   max_rounds: 2         # review → fix loops before the human is asked
   verify: true          # verifiers check blocking and should-fix findings before anyone acts on them
@@ -71,6 +73,32 @@ These are the human checkpoints. Turning `before_build` off lets the factory sta
 For an app with a `dev` stage in a sandbox account, such as one `factory-repo-setup` set up. When `deploy_dev` is set, green ends by deploying the branch's `dev` stage and running `smoke_dev` against it, and review checks the result. The `dev` stage stays up while the pull request is open, and the repo's CI destroys it when the pull request merges or closes. `destroy_dev` is for removing it by hand, such as when ship didn't open a pull request.
 
 The commands run with `AWS_PROFILE` set to `dev.profile`, which must be a profile for the agent account, never an admin profile or one for production. `deploy_dev` needs `dev.profile`; with `deploy_dev` set and no profile, green stops with `needs-human`.
+
+### `research`
+
+Research the spec stage reads before it writes the change, so the requirements it proposes start from evidence rather than from the request alone. Each entry is a project's folder in a knowledge bundle in [OKF](https://github.com/GoogleCloudPlatform/knowledge-catalog/blob/main/okf/SPEC.md) form: an `index.md` listing its concepts, with `findings/`, `questions/` and, in older bundles, `decisions/`.
+
+The research informs; it doesn't decide. The human decides in the spec review (`confirm.after_spec`), where the orchestrator lists every requirement the spec stage took from the research. So:
+
+- A project **Question**'s recommendation is a proposal the spec stage may turn into a requirement, citing the Question.
+- A **Decision** file is a legacy record of an earlier choice. Treat it as a strong recommendation, cited the same way.
+- A **Finding** is evidence. It can support a requirement's numbers or wording, but never becomes a requirement by itself.
+- Where the research offers options with no recommendation, or recommends something the request contradicts, the spec stage stops with `needs-human` and puts both in Questions.
+
+Each entry has:
+
+- `name`: how the spec and review refer to it.
+- `path` and/or `url`: the project's folder on disk, read first if present, and its URL, used for citations. With only a `path`, citations name the file.
+- `private`: `true` if it must not be quoted, linked or named in the repo or a pull request. Requirements then give their reasoning in plain words. Put private entries in `factory.config.local.yaml`. A private app repo can cite a private research repo by URL, so it needn't mark it private.
+
+```yaml
+research:
+  - name: my-app research
+    path: ~/Code/research/knowledge/projects/my-app
+    url: https://github.com/example/research/tree/main/knowledge/projects/my-app
+```
+
+The reviewer reads the same entries, and reports code that contradicts a recommendation the spec cited as a `should-fix`.
 
 ### `review.verify`
 
